@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Target Counterer" />
+  <title>Target Counterer</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════
+     DASHBOARD PAGE
+══════════════════════════════════════════════ -->
+<div id="dashboard-page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-title" id="nav-title">TARGET COUNTERER</div>
+    <div class="nav-date" id="nav-date"></div>
+    <button class="icon-btn" id="nav-settings-btn" aria-label="Settings">⚙</button>
+  </nav>
+
+  <main>
+
+    <!-- HERO PROGRESS CARD -->
+    <div class="hero-card">
+      <div class="target-label">Total Saved</div>
+      <div class="amount-row">
+        <span class="amount-currency">RM</span>
+        <span class="amount-current" id="amount-current">0.00</span>
+      </div>
+      <div class="amount-target" id="amount-target">of <span>RM 600.00</span></div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-meta">
+        <span class="progress-pct" id="progress-pct">0.0%</span>
+        <span class="progress-remaining" id="progress-remaining">RM 600.00 to go</span>
+      </div>
+
+      <!-- Collect banner / routine status -->
+      <div class="routine-banner not-today" id="routine-banner" style="display:none">
+        <span>○</span> Loading…
+      </div>
+    </div>
+
+    <!-- COLLECT BUTTON (shown only on routine days before collecting) -->
+    <div id="collect-section" style="display:none">
+      <button class="collect-btn" id="collect-btn">
+        <span class="btn-icon">⚡</span>
+        <span id="collect-label">Collect Daily</span>
+      </button>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Routine Total</div>
+        <div class="stat-value" id="stat-routine">RM 0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Manual Total</div>
+        <div class="stat-value" id="stat-manual">RM 0.00</div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+      <div class="section-header">
+        <span class="section-title">Recent Entries</span>
+      </div>
+      <div class="entry-list" id="entry-list"></div>
+    </div>
+
+    <!-- spacer for FAB -->
+    <div style="height:80px"></div>
+  </main>
+
+</div><!-- /dashboard-page -->
+
+
+<!-- ══════════════════════════════════════════════
+     SETTINGS PAGE
+══════════════════════════════════════════════ -->
+<div id="settings-page">
+
+  <nav class="nav">
+    <div class="nav-title">SETTINGS</div>
+    <div></div>
+    <button class="icon-btn" onclick="showDashboard()" aria-label="Back">←</button>
+  </nav>
+
+  <div class="settings-main">
+
+    <div class="card">
+      <div class="settings-section-title">Goal</div>
+
+      <div class="form-group">
+        <label class="form-label" for="s-target">Target Amount (RM)</label>
+        <input class="form-input" type="number" id="s-target" placeholder="600" min="1" step="any" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="settings-section-title">Daily Routine</div>
+
+      <div class="form-group">
+        <label class="form-label" for="s-routine-amount">Amount Per Day (RM)</label>
+        <input class="form-input" type="number" id="s-routine-amount" placeholder="9" min="0.01" step="any" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Active Days</label>
+        <div class="days-grid">
+          <button class="day-btn" data-day="0">Sun</button>
+          <button class="day-btn" data-day="1">Mon</button>
+          <button class="day-btn" data-day="2">Tue</button>
+          <button class="day-btn" data-day="3">Wed</button>
+          <button class="day-btn" data-day="4">Thu</button>
+          <button class="day-btn" data-day="5">Fri</button>
+          <button class="day-btn" data-day="6">Sat</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="modal-btn" id="save-settings-btn">Save Settings</button>
+
+    <div class="card" style="margin-top:8px">
+      <div class="settings-section-title" style="margin-bottom:12px">Danger Zone</div>
+      <button class="danger-btn" id="reset-btn">Reset All Data</button>
+    </div>
+
+    <div style="height:40px"></div>
+  </div>
+
+</div><!-- /settings-page -->
+
+
+<!-- ══════════════════════════════════════════════
+     FAB (Add Manual Entry)
+══════════════════════════════════════════════ -->
+<button class="fab" id="fab" aria-label="Add manual entry">＋</button>
+
+
+<!-- ══════════════════════════════════════════════
+     MANUAL ENTRY MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="manual-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Manual Entry</div>
+
+    <div class="form-group">
+      <label class="form-label" for="manual-amount">Amount (RM)</label>
+      <input class="form-input" type="number" id="manual-amount"
+             placeholder="0.00" min="0.01" step="any" inputmode="decimal" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="manual-note">Note (optional)</label>
+      <input class="form-input" type="text" id="manual-note"
+             placeholder="e.g. Weekend bonus" maxlength="60" />
+    </div>
+
+    <button class="modal-btn" id="manual-confirm">Add Entry</button>
+    <button class="modal-btn secondary" id="manual-cancel">Cancel</button>
+  </div>
+</div>
+
+
+<script src="app.js"></script>
+</body>
+</html>
